@@ -13,7 +13,7 @@ import subprocess
 import re
 
 # === CONFIG ===
-ABUSEIPDB_API_KEY = "e7fe76e0f750052d3c15dd46e6b6322d043c2f6f1cece74f7522bcf4cffb96b386091e256c15c1fa"
+ABUSEIPDB_API_KEY =os.getenv("ABUSEIPDB_API_KEY", "")
 SCAN_TIMEOUT = 1  # Seconds
 
 # Common ports to scan
