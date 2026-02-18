@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IntelliScan - Forest Guardian</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body>
+    <!-- Forest Elements -->
+    <div class="forest-element tree-1">
+        <i class="fas fa-tree fa-3x"></i>
+    </div>
+    <div class="forest-element tree-2">
+        <i class="fas fa-tree fa-4x"></i>
+    </div>
+    <div class="forest-element tree-3">
+        <i class="fas fa-tree fa-3x"></i>
+    </div>
+    <div class="forest-element tree-4">
+        <i class="fas fa-tree fa-4x"></i>
+    </div>
+
+    <nav class="navbar">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-shield-alt"></i>
+                IntelliScan
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="scan-card">
+                    <div class="card-header">
+                        <h4 class="mb-0"><i class="fas fa-search"></i> Network Security Scan</h4>
+                    </div>
+                    <div class="card-body">
+                        <form id="scanForm">
+                            <div class="mb-3">
+                                <label for="ip" class="form-label">Target IP Address</label>
+                                <input type="text" class="form-control" id="ip" name="ip" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="portRange" class="form-label">Port Range</label>
+                                <select class="form-select" id="portRange" name="portRange" required>
+                                    <option value="web">Web Services (80, 443, 8080, 8443)</option>
+                                    <option value="mail">Mail Services (25, 110, 143, 465, 587, 993, 995)</option>
+                                    <option value="file">File Transfer (20, 21, 22, 23)</option>
+                                    <option value="database">Database Services (1433, 1434, 3306, 3389, 5432, 6379, 27017)</option>
+                                    <option value="remote">Remote Access (22, 23, 3389, 5900)</option>
+                                    <option value="gaming">Gaming Services (25565, 27015, 7777)</option>
+                                    <option value="all">All Common Ports</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="specificPorts" class="form-label">Specific Ports (comma-separated)</label>
+                                <input type="text" class="form-control" id="specificPorts" name="specificPorts" placeholder="e.g., 80,443,8080">
+                            </div>
+                            <div class="mb-3">
+                                <label for="scanType" class="form-label">Nmap Scan Type</label>
+                                <select class="form-select" id="scanType" name="scanType">
+                                    <option value="quick">Quick Scan (Most Common Ports)</option>
+                                    <option value="full">Full Port Scan</option>
+                                    <option value="aggressive">Aggressive Scan (OS & Service Detection)</option>
+                                    <option value="vuln">Vulnerability Scan</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-play"></i> Start Scan
+                            </button>
+                        </form>
+
+                        <div class="mt-4">
+                            <div class="progress mb-3">
+                                <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                            </div>
+                            <div class="log-container">
+                                <div id="logs"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="results-container" id="resultsContainer">
+                    <div class="scan-card">
+                        <div class="card-header">
+                            <h4 class="mb-0"><i class="fas fa-chart-bar"></i> Scan Results</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="risk-assessment mb-4">
+                                <h5>Risk Assessment</h5>
+                                <div id="riskLevel" class="risk-badge"></div>
+                            </div>
+                            <div class="open-ports mb-4">
+                                <h5>Open Ports</h5>
+                                <div id="openPorts"></div>
+                            </div>
+                            <div class="reports mb-4">
+                                <h5>Reports</h5>
+                                <div id="reportLinks"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('scanForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const form = e.target;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const progressBar = document.querySelector('.progress-bar');
+            const logsDiv = document.getElementById('logs');
+            const resultsContainer = document.getElementById('resultsContainer');
+            
+            // Reset UI
+            progressBar.style.width = '0%';
+            logsDiv.innerHTML = '';
+            resultsContainer.style.display = 'none';
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<div class="loading-spinner"></div> Scanning...';
+            
+            // Get form data
+            const formData = {
+                ip: form.ip.value,
+                portRange: form.portRange.value,
+                scanType: form.scanType.value
+            };
+            
+            // Add specific ports if provided
+            if (form.specificPorts.value) {
+                formData.portRange = `specific:${form.specificPorts.value}`;
+            }
+            
+            try {
+                // Start scan
+                const response = await fetch('/scan', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to start scan');
+                }
+                
+                // Poll for progress
+                const progressInterval = setInterval(async () => {
+                    const progressResponse = await fetch('/progress');
+                    const progressData = await progressResponse.json();
+                    
+                    // Update progress bar
+                    progressBar.style.width = `${progressData.progress}%`;
+                    
+                    // Update logs
+                    logsDiv.innerHTML = progressData.logs.map(log => 
+                        `<div class="log-entry">${log}</div>`
+                    ).join('');
+                    logsDiv.scrollTop = logsDiv.scrollHeight;
+                    
+                    // Check if scan is complete
+                    if (progressData.status === 'completed' || progressData.status === 'error') {
+                        clearInterval(progressInterval);
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-play"></i> Start Scan';
+                        
+                        if (progressData.status === 'completed') {
+                            // Get results
+                            const resultsResponse = await fetch('/results');
+                            const resultsData = await resultsResponse.json();
+                            
+                            // Display results
+                            document.getElementById('riskLevel').textContent = resultsData.riskLevel;
+                            document.getElementById('riskLevel').className = 
+                                `risk-badge risk-${resultsData.riskLevel.toLowerCase()}`;
+                            
+                            document.getElementById('openPorts').innerHTML = 
+                                resultsData.openPorts.map(port => 
+                                    `<span class="port-item">${port}</span>`
+                                ).join('');
+                            
+                            document.getElementById('reportLinks').innerHTML = `
+                                <a href="/reports/${resultsData.htmlReport}" class="report-link" target="_blank">
+                                    <i class="fas fa-file-alt"></i> View HTML Report
+                                </a>
+                            `;
+                            
+                            resultsContainer.style.display = 'block';
+                        } else {
+                            alert('Scan failed: ' + progressData.error);
+                        }
+                    }
+                }, 1000);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to start scan: ' + error.message);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-play"></i> Start Scan';
+            }
+        });
+
+        // Handle port range selection
+        document.getElementById('portRange').addEventListener('change', function() {
+            const specificPortsInput = document.getElementById('specificPorts');
+            specificPortsInput.disabled = this.value !== 'specific';
+        });
+
+        // Add navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+    </script>
+</body>
+</html> 

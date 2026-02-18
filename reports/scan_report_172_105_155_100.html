@@ -1,0 +1,444 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>IntelliScan Report - 172.105.155.100</title>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <style>
+            :root {
+                --forest-dark: #1B4332;
+                --forest-medium: #2D6A4F;
+                --forest-light: #40916C;
+                --forest-accent: #74C69D;
+                --forest-bg: #D8F3DC;
+                --forest-text: #081C15;
+                --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+                --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                --glass-bg: rgba(255, 255, 255, 0.7);
+                --glass-border: rgba(255, 255, 255, 0.2);
+                --glass-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+            }
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Poppins', sans-serif;
+                line-height: 1.6;
+                color: var(--forest-text);
+                background: linear-gradient(135deg, var(--forest-bg), #ffffff);
+                min-height: 100vh;
+                position: relative;
+                overflow-x: hidden;
+            }
+
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: 
+                    radial-gradient(circle at 0% 0%, rgba(64, 145, 108, 0.15) 0%, transparent 50%),
+                    radial-gradient(circle at 100% 0%, rgba(64, 145, 108, 0.15) 0%, transparent 50%),
+                    radial-gradient(circle at 100% 100%, rgba(64, 145, 108, 0.15) 0%, transparent 50%),
+                    radial-gradient(circle at 0% 100%, rgba(64, 145, 108, 0.15) 0%, transparent 50%);
+                pointer-events: none;
+                z-index: -1;
+            }
+
+            .report-header {
+                background: linear-gradient(135deg, var(--forest-medium), var(--forest-light));
+                color: white;
+                padding: 3rem 2rem;
+                text-align: center;
+                position: relative;
+                overflow: hidden;
+                margin-bottom: 2rem;
+            }
+
+            .report-header::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: url('data:image/svg+xml,<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h20v20H0z" fill="none"/><path d="M10 0l2 6h6l-5 4 2 6-5-4-5 4 2-6-5-4h6z" fill="%23ffffff" fill-opacity="0.05"/></svg>');
+                opacity: 0.1;
+            }
+
+            .report-title {
+                font-size: 2.5rem;
+                font-weight: 700;
+                margin-bottom: 1rem;
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            }
+
+            .report-subtitle {
+                font-size: 1.2rem;
+                opacity: 0.9;
+            }
+
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 0 2rem;
+                width: 100%;
+                overflow-x: hidden;
+            }
+
+            .report-section {
+                background: var(--glass-bg);
+                backdrop-filter: blur(16px);
+                -webkit-backdrop-filter: blur(16px);
+                border-radius: 24px;
+                padding: 2rem;
+                margin-bottom: 2rem;
+                box-shadow: var(--glass-shadow);
+                border: 1px solid var(--glass-border);
+            }
+
+            .section-title {
+                color: var(--forest-dark);
+                font-size: 1.5rem;
+                font-weight: 600;
+                margin-bottom: 1.5rem;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+
+            .section-title::before {
+                content: '';
+                display: inline-block;
+                width: 4px;
+                height: 24px;
+                background: var(--forest-accent);
+                border-radius: 2px;
+            }
+
+            .info-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 1.5rem;
+            }
+
+            .info-card {
+                background: rgba(255, 255, 255, 0.9);
+                padding: 1.5rem;
+                border-radius: 16px;
+                box-shadow: var(--card-shadow);
+                border: 1px solid var(--glass-border);
+                transition: var(--transition);
+                width: 100%;
+                overflow: hidden;
+            }
+
+            .info-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+            }
+
+            .info-label {
+                color: var(--forest-medium);
+                font-weight: 600;
+                font-size: 1.1rem;
+                margin-bottom: 1rem;
+            }
+
+            .info-value {
+                color: var(--forest-text);
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+                max-width: 100%;
+            }
+
+            .info-value p {
+                margin: 0.8rem 0;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                align-items: flex-start;
+            }
+
+            .info-value strong {
+                color: var(--forest-dark);
+                min-width: 150px;
+                flex-shrink: 0;
+            }
+
+            .risk-badge {
+                display: inline-block;
+                padding: 0.8rem 1.5rem;
+                border-radius: 30px;
+                color: white;
+                font-weight: 600;
+                font-size: 1.1rem;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                background: linear-gradient(135deg, #28a745, #28a745dd);
+                box-shadow: 0 4px 15px #28a74540;
+            }
+
+            .port-list {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                gap: 1rem;
+                margin-top: 1rem;
+            }
+
+            .port-item {
+                background: linear-gradient(135deg, var(--forest-accent), var(--forest-light));
+                color: white;
+                padding: 0.8rem;
+                border-radius: 12px;
+                text-align: center;
+                font-family: monospace;
+                font-weight: 500;
+                box-shadow: 0 4px 15px rgba(116, 198, 157, 0.2);
+                transition: var(--transition);
+            }
+
+            .port-item:hover {
+                transform: scale(1.05) translateY(-2px);
+                box-shadow: 0 6px 20px rgba(116, 198, 157, 0.3);
+            }
+
+            .service-table {
+                width: 100%;
+                border-collapse: separate;
+                border-spacing: 0;
+                margin-top: 1rem;
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+                table-layout: fixed;
+            }
+
+            .service-table th, .service-table td {
+                padding: 1rem;
+                text-align: left;
+                border-bottom: 1px solid var(--glass-border);
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+            }
+
+            .service-table th:nth-child(1),
+            .service-table td:nth-child(1) {
+                width: 15%;
+            }
+
+            .service-table th:nth-child(2),
+            .service-table td:nth-child(2) {
+                width: 15%;
+            }
+
+            .service-table th:nth-child(3),
+            .service-table td:nth-child(3) {
+                width: 70%;
+            }
+
+            .nmap-output {
+                background: rgba(0, 0, 0, 0.8);
+                color: var(--forest-accent);
+                padding: 1.5rem;
+                border-radius: 12px;
+                font-family: 'Consolas', monospace;
+                white-space: pre-wrap;
+                overflow-x: auto;
+                font-size: 0.9rem;
+                line-height: 1.5;
+                max-width: 100%;
+                word-wrap: break-word;
+            }
+
+            .reports-section {
+                margin-top: 1.5rem;
+            }
+
+            .report-item {
+                background: rgba(255, 255, 255, 0.9);
+                padding: 1.5rem;
+                margin-bottom: 1rem;
+                border-radius: 12px;
+                border: 1px solid var(--glass-border);
+                transition: var(--transition);
+                width: 100%;
+                overflow: hidden;
+            }
+
+            .report-item:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            }
+
+            .report-item p {
+                margin: 0.8rem 0;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+            }
+
+            .footer {
+                text-align: center;
+                padding: 2rem;
+                color: var(--forest-medium);
+                font-size: 0.9rem;
+                margin-top: 3rem;
+            }
+
+            @media (max-width: 768px) {
+                .container {
+                    padding: 0 1rem;
+                }
+
+                .report-title {
+                    font-size: 2rem;
+                }
+
+                .info-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .port-list {
+                    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+                }
+
+                .info-value p {
+                    flex-direction: column;
+                    gap: 0.2rem;
+                }
+
+                .info-value strong {
+                    min-width: 100%;
+                }
+
+                .service-table {
+                    display: block;
+                    overflow-x: auto;
+                    white-space: nowrap;
+                }
+
+                .service-table th, .service-table td {
+                    white-space: normal;
+                    min-width: 120px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="report-header">
+            <h1 class="report-title">IntelliScan Security Report</h1>
+            <p class="report-subtitle">Advanced Network Security Analysis</p>
+        </div>
+
+        <div class="container">
+            <div class="report-section">
+                <h2 class="section-title">Target Information</h2>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-label">Target IP Address</div>
+                        <div class="info-value">172.105.155.100</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Scan Timestamp</div>
+                        <div class="info-value">2025-05-30 08:55:20</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="report-section">
+                <h2 class="section-title">Security Assessment</h2>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-label">Risk Level</div>
+                        <div class="info-value">
+                            <span class="risk-badge">Low</span>
+                        </div>
+                    </div>
+                    
+            <div class="info-card">
+                <div class="info-label">Threat Intelligence Details</div>
+                <div class="info-value">
+                    <p><strong>IP Address:</strong> 172.105.155.100</p>
+                    <p><strong>IP Version:</strong> 4</p>
+                    <p><strong>Is Public:</strong> True</p>
+                    <p><strong>Is Whitelisted:</strong> None</p>
+                    <p><strong>Abuse Confidence Score:</strong> 0%</p>
+                    <p><strong>Country:</strong> United States of America (US)</p>
+                    <p><strong>Usage Type:</strong> Data Center/Web Hosting/Transit</p>
+                    <p><strong>ISP:</strong> Linode</p>
+                    <p><strong>Domain:</strong> linode.com</p>
+                    <p><strong>Hostnames:</strong> 172-105-155-100.ip.linodeusercontent.com</p>
+                    <p><strong>Is Tor Exit Node:</strong> False</p>
+                    <p><strong>Total Reports:</strong> 0</p>
+                    <p><strong>Distinct Users:</strong> 0</p>
+                    <p><strong>Last Reported:</strong> None</p>
+                </div>
+            </div>
+            <div class="info-card">
+                <div class="info-label">Detailed Reports</div>
+                <div class="info-value">
+                    <p>No detailed reports available</p>
+                </div>
+            </div>
+        
+                </div>
+            </div>
+
+            <div class="report-section">
+                <h2 class="section-title">Open Ports Analysis</h2>
+                <div class="info-card">
+                    <div class="info-label">Detected Open Ports</div>
+                    <div class="port-list">
+                        <div class="info-value">No open ports detected</div>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div class="report-section">
+                <h2 class="section-title">Nmap Scan Results</h2>
+                <div class="info-card">
+                    <div class="info-label">Operating System</div>
+                    <div class="info-value">Not detected</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">Detected Services</div>
+                    <div class="info-value">
+                        <table class="service-table">
+                            <tr>
+                                <th>Port</th>
+                                <th>State</th>
+                                <th>Service</th>
+                            </tr>
+                            
+                        </table>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">Raw Nmap Output</div>
+                    <div class="info-value">
+                        <pre class="nmap-output">Starting Nmap 7.80 ( https://nmap.org ) at 2025-05-30 03:55 UTC
+Note: Host seems down. If it is really up, but blocking our ping probes, try -Pn
+Nmap done: 1 IP address (0 hosts up) scanned in 2.16 seconds
+</pre>
+                    </div>
+                </div>
+            </div>
+        
+
+            <div class="footer">
+                <p>Generated by IntelliScan - Advanced Network Security Tool</p>
+                <p>© 2024 All rights reserved</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    
