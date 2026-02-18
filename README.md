@@ -1,16 +1,18 @@
 # IntelliScan
 
-IntelliScan is a lightweight Flask web application for authorized network assessment and security learning. It performs basic port discovery, enriches scan results with threat-intelligence signals (e.g., AbuseIPDB-style reputation checks), assigns a simple risk level, and generates readable HTML reports saved under `reports/`.
+IntelliScan is a lightweight Flask web application built for **authorized** network assessment and security learning. It performs basic port discovery, enriches scan results with threat-intelligence signals (e.g., AbuseIPDB-style reputation checks), assigns a simple risk level, and generates readable HTML reports saved under `reports/`.
 
 
 ## Features
 
 - Web dashboard to start scans and review results
-- Port scanning with configurable options (based on implementation)
+- Port scanning (based on implementation)
 - Threat-intelligence enrichment (reputation/confidence signals and metadata where available)
 - Risk scoring (Low / Medium / High) to help prioritize findings
 - Automatic HTML report generation stored in `reports/`
 - Optional Docker/Nmap support for deeper scanning workflows
+
+---
 
 ## Project Structure
 
@@ -26,66 +28,91 @@ IntelliScan is a lightweight Flask web application for authorized network assess
 │       └── style.css
 └── reports/
     └── scan_report_*.html
-Requirements
+
+
+##Requirements
+
 Python 3.9+ (recommended)
-
 pip
-
 (Optional) Docker
 
-Installation
-Clone the repository and install dependencies:
+##Installation
 
-git clone https://github.com/<arunparihar001>/<IntelliScan-Advanced-Network-Security-Scanner>.git
-cd <IntelliScan-Advanced-Network-Security-Scanner>
+Clone the repository and create a virtual environment:
+
+git clone https://github.com/arunparihar001/IntelliScan-Advanced-Network-Security-Scanner-.git
+cd IntelliScan-Advanced-Network-Security-Scanner-
 python -m venv .venv
+
+
 Activate the virtual environment:
 
-Windows (PowerShell)
+**Windows (PowerShell)**
 
 .venv\Scripts\activate
-macOS/Linux
+
+
+**macOS/Linux**
 
 source .venv/bin/activate
+
+
 Install dependencies:
 
 pip install -r requirements.txt
+
+
 If you do not have a requirements.txt yet:
 
 pip install flask requests
-Configuration
+
+
+##Configuration
+
 If threat-intelligence lookups require an API key, do not hardcode it in the source code. Set it as an environment variable instead.
 
-Example:
+Example variable name:
 
 ABUSEIPDB_API_KEY
 
-Windows (PowerShell):
+**Windows (PowerShell)**
 
 setx ABUSEIPDB_API_KEY "YOUR_KEY_HERE"
-macOS/Linux:
+
+
+**macOS/Linux**
 
 export ABUSEIPDB_API_KEY="YOUR_KEY_HERE"
-Running the Application
+
+##Running the Application
+
 Start the server:
 
 python intelliscan.py
-Open the application in your browser:
+
+
+Open in your browser:
 
 http://127.0.0.1:5000
 
-Reports
+##Reports
+
 Generated scan reports are saved as HTML files under:
 
 reports/scan_report_<target>.html
 
-Docker (Optional)
+##Docker (Optional)
+
+If your Dockerfile is intended for Nmap usage (ENTRYPOINT nmap), document that here.
+If you want Docker to run the Flask app, you should create a separate Dockerfile for the app.
+
 Build the image:
-
 docker build -t intelliscan .
+
+
 Run the container:
-
 docker run -p 5000:5000 -e ABUSEIPDB_API_KEY="YOUR_KEY_HERE" intelliscan
-Then open:
 
+
+Then open:
 http://127.0.0.1:5000
